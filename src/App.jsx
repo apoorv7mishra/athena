@@ -4,6 +4,7 @@ import { defaultQuestions as questions } from "./data/questions";
 import { useExamTimer } from "./hooks/useExamTimer";
 import { useProctorCamera } from "./hooks/useProctorCamera";
 import { HelpDialog } from "./components/Modals/HelpDialog";
+import { ConfirmSubmitDialog } from "./components/Modals/ConfirmSubmitDialog";
 import { PermissionScreen } from "./components/Setup/PermissionScreen";
 import { ExamHeader } from "./components/Exam/ExamHeader";
 import { QuestionTracker } from "./components/Exam/QuestionTracker";
@@ -17,6 +18,8 @@ function App() {
   const [answers, setAnswers] = useState({});
   const [flaggedQuestions, setFlaggedQuestions] = useState({});
   const [helpOpen, setHelpOpen] = useState(false);
+  const [confirmSubmitOpen, setConfirmSubmitOpen] = useState(false);
+
 
 
   // Custom Camera Proctor Hook
@@ -75,6 +78,11 @@ function App() {
   }
 
   function finishTest() {
+    setConfirmSubmitOpen(true);
+  }
+
+  function handleConfirmSubmit() {
+    setConfirmSubmitOpen(false);
     setSubmitted(true);
     setStarted(false);
     stopCamera();
@@ -88,11 +96,13 @@ function App() {
   }
 
   function handleRestart() {
+
     setSubmitted(false);
     setStarted(false);
     setQuestionIndex(0);
     setAnswers({});
     setFlaggedQuestions({});
+    setConfirmSubmitOpen(false);
   }
 
   // Active or Completed Exam View
@@ -145,8 +155,16 @@ function App() {
             </>
           )}
 
+          <ConfirmSubmitDialog
+            isOpen={confirmSubmitOpen}
+            answeredCount={Object.keys(answers).length}
+            totalQuestions={questions.length}
+            onConfirm={handleConfirmSubmit}
+            onCancel={() => setConfirmSubmitOpen(false)}
+          />
 
           {captureMessage && <p className="capture-status">{captureMessage}</p>}
+
           {captureDirectory && (
             <p className="capture-status">
               Camera snapshots are saved locally every 4 seconds in: {captureDirectory}
