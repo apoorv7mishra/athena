@@ -1,16 +1,78 @@
-# React + Vite
+# Athena - Proctored Examination Desktop Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Athena is a modern desktop assessment environment built with **React 19**, **Vite**, and **Electron**. It provides an automated proctoring workflow designed to ensure integrity during online assessments.
 
-Currently, two official plugins are available:
+## Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Pre-Exam Validation**: Verifies macOS/OS camera permissions before permitting test entry.
+- **Kiosk Mode Lock**: Requests and enforces full-screen kiosk mode via Electron IPC to deter distraction and unauthorized tab switching.
+- **Automated Snapshot Proctoring**: Captures high-resolution video frames via HTML5 Canvas every 4 seconds and persists them securely to the application's local user storage (`userData/cameraFeed`).
+- **Real-Time Timed Exam**: Manages countdown timers synchronizing state between Electron main process and React front-end.
+- **Interactive MCQ Engine**: Step-by-step question navigation, responsive jump list, question completion tracking, and instant score computation.
+- **Accessible Help System**: Built-in modal dialog providing clear pre-test instructions and troubleshooting steps for system permissions.
 
-## React Compiler
+## Architecture
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+├── electron/
+│   ├── main.cjs       # Electron main process (IPC handlers, kiosk, camera permissions, file storage)
+│   └── preload.cjs    # Context isolation bridge exposing electronAPI to renderer
+├── src/
+│   ├── components/    # Reusable modular UI components
+│   ├── constants/     # Exam configuration constants
+│   ├── data/          # Assessment question banks
+│   ├── hooks/         # Custom React hooks (timer, proctor camera)
+│   ├── utils/         # Formatting and proctoring helper functions
+│   ├── App.jsx        # Root assessment orchestrator
+│   ├── App.css        # Application layout styling
+│   └── main.jsx       # React application entry point
+```
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js (v18+)
+- npm or yarn
+
+### Installation
+
+```bash
+npm install
+```
+
+### Development Mode
+
+1. Start the Vite React development server:
+   ```bash
+   npm run dev
+   ```
+
+2. In a separate terminal, launch the Electron application:
+   ```bash
+   npm start
+   ```
+
+### Production Build
+
+```bash
+npm run build
+```
+
+## Electron IPC API
+
+Athena exposes secure IPC methods via `window.electronAPI`:
+
+| Method | Description |
+|---|---|
+| `requestCameraAccess()` | Queries and requests OS-level media access permissions |
+| `openCameraSettings()` | Directs the user to system privacy settings (macOS) |
+| `setFullScreen()` | Locks the Electron window into kiosk full-screen mode |
+| `startTest()` | Initializes the assessment timer in the main process |
+| `getRemainingTime()` | Returns remaining milliseconds until test completion |
+| `showExamRules()` | Displays native modal dialog outlining examination rules |
+| `savePhoto(buffer)` | Saves periodic camera snapshots to disk |
+
+## License
+
+Private & Confidential - All Rights Reserved.
