@@ -361,6 +361,72 @@ appearing in the layout.
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.025);
 }
 
+.question-tracker {
+  margin-bottom: 16px;
+  padding: 20px 24px;
+  border: 1px solid #e7e4df;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.question-tracker-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  color: #555555;
+  font-size: 14px;
+}
+
+.answer-progress {
+  display: block;
+  width: 100%;
+  height: 7px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: #ebe9e5;
+  accent-color: #263c53;
+}
+
+.answer-progress::-webkit-progress-bar {
+  border-radius: 999px;
+  background: #ebe9e5;
+}
+
+.answer-progress::-webkit-progress-value {
+  border-radius: 999px;
+  background: #263c53;
+}
+
+.question-jump-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.question-jump {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #d9d6d1;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #333333;
+  cursor: pointer;
+}
+
+.question-jump.is-answered {
+  border-color: #263c53;
+  background: #eaf0f5;
+}
+
+.question-jump.is-current {
+  outline: 2px solid #263c53;
+  outline-offset: 2px;
+  font-weight: 700;
+}
+
 .question-card h2 {
   font-size: 14px;
 
@@ -464,6 +530,61 @@ appearing in the layout.
   overflow-wrap: anywhere;
 }
 
+.help-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(20, 27, 35, 0.48);
+}
+
+.help-dialog {
+  position: relative;
+  width: min(100%, 480px);
+  padding: 32px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+.help-dialog h2 {
+  margin: 0 36px 16px 0;
+  color: #292929;
+  font-size: 22px;
+}
+
+.help-dialog p {
+  margin-bottom: 14px;
+  color: #555555;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.help-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #555555;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.help-close:hover {
+  background: #f5f4f2;
+}
+
+.help-dialog .end-test-btn {
+  margin-top: 6px;
+}
+
 @media (max-width: 640px) {
   .page-container,
   .exam-page {
@@ -478,6 +599,14 @@ appearing in the layout.
 
   .question-card {
     padding: 28px 20px;
+  }
+
+  .question-tracker {
+    padding: 18px 20px;
+  }
+
+  .help-dialog {
+    padding: 28px 22px;
   }
 
   .exam-header,

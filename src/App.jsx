@@ -36,6 +36,18 @@ function App() {
   const [captureMessage, setCaptureMessage] = useState("");
   const [captureDirectory, setCaptureDirectory] = useState("");
   const [cameraPermissionBlocked, setCameraPermissionBlocked] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  useEffect(() => {
+    if (!helpOpen) return;
+
+    function closeOnEscape(event) {
+      if (event.key === "Escape") setHelpOpen(false);
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [helpOpen]);
 
   async function getElapsedTime() {
     const currTime = await window.electronAPI.getRemainingTime();
@@ -212,6 +224,7 @@ function App() {
 
   if (started || submitted) {
     const question = questions[questionIndex];
+    const answeredCount = Object.keys(answers).length;
     const score = questions.reduce(
       (total, item, index) => total + (answers[index] === item.answer ? 1 : 0),
       0,
@@ -249,41 +262,75 @@ function App() {
               </button>
             </section>
           ) : (
-            <section className="question-card">
-              <h2>
-                Question {questionIndex + 1} of {questions.length}
-              </h2>
-              <p>{question.prompt}</p>
-              <div role="radiogroup" aria-label={question.prompt}>
-                {question.options.map((option) => (
-                  <label className="option-row" key={option}>
-                    <input
-                      type="radio"
-                      name={`question-${questionIndex}`}
-                      value={option}
-                      checked={answers[questionIndex] === option}
-                      onChange={() => selectAnswer(option)}
-                    />
-                    <span>{option}</span>
-                  </label>
-                ))}
-              </div>
-              <div className="navigation-buttons">
-                <button
-                  onClick={() => setQuestionIndex((index) => index - 1)}
-                  disabled={questionIndex === 0}
-                >
-                  Previous
-                </button>
-                {questionIndex === questions.length - 1 ? (
-                  <button onClick={finishTest}>Submit answers</button>
-                ) : (
-                  <button onClick={() => setQuestionIndex((index) => index + 1)}>
-                    Next
+            <>
+              <nav className="question-tracker" aria-label="Question navigation">
+                <div className="question-tracker-heading">
+                  <span>Questions</span>
+                  <span>
+                    {answeredCount} of {questions.length} answered
+                  </span>
+                </div>
+                <progress
+                  className="answer-progress"
+                  value={answeredCount}
+                  max={questions.length}
+                  aria-label={`${answeredCount} of ${questions.length} questions answered`}
+                />
+                <div className="question-jump-list">
+                  {questions.map((item, index) => (
+                    <button
+                      className={`question-jump${
+                        index === questionIndex ? " is-current" : ""
+                      }${answers[index] ? " is-answered" : ""}`}
+                      key={item.prompt}
+                      onClick={() => setQuestionIndex(index)}
+                      aria-label={`Go to question ${index + 1}${
+                        answers[index] ? ", answered" : ", unanswered"
+                      }`}
+                      aria-current={index === questionIndex ? "step" : undefined}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+              </nav>
+
+              <section className="question-card">
+                <h2>
+                  Question {questionIndex + 1} of {questions.length}
+                </h2>
+                <p>{question.prompt}</p>
+                <div role="radiogroup" aria-label={question.prompt}>
+                  {question.options.map((option) => (
+                    <label className="option-row" key={option}>
+                      <input
+                        type="radio"
+                        name={`question-${questionIndex}`}
+                        value={option}
+                        checked={answers[questionIndex] === option}
+                        onChange={() => selectAnswer(option)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="navigation-buttons">
+                  <button
+                    onClick={() => setQuestionIndex((index) => index - 1)}
+                    disabled={questionIndex === 0}
+                  >
+                    Previous
                   </button>
-                )}
-              </div>
-            </section>
+                  {questionIndex === questions.length - 1 ? (
+                    <button onClick={finishTest}>Submit answers</button>
+                  ) : (
+                    <button onClick={() => setQuestionIndex((index) => index + 1)}>
+                      Next
+                    </button>
+                  )}
+                </div>
+              </section>
+            </>
           )}
           {captureMessage && <p className="capture-status">{captureMessage}</p>}
           {captureDirectory && (
@@ -365,8 +412,49 @@ function App() {
           >
             Go To Test
           </button>
-          <button className="btn btn-outline">Need Help?</button>
+          <button
+            className="btn btn-outline"
+            onClick={() => setHelpOpen(true)}
+          >
+            Need Help?
+          </button>
         </div>
+        {helpOpen && (
+          <div className="help-backdrop" onClick={() => setHelpOpen(false)}>
+            <section
+              className="help-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="help-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                className="help-close"
+                onClick={() => setHelpOpen(false)}
+                aria-label="Close help"
+              >
+                ×
+              </button>
+              <h2 id="help-title">Before you start</h2>
+              <p>
+                Allow camera access, then choose <strong>Go To Test</strong>.
+                Your camera snapshots are saved on this computer while the quiz
+                is active.
+              </p>
+              <p>
+                If camera access is blocked, open your system privacy settings
+                and allow access for Athena. You can move between questions and
+                change an answer before submitting.
+              </p>
+              <button
+                className="end-test-btn"
+                onClick={() => setHelpOpen(false)}
+              >
+                Got it
+              </button>
+            </section>
+          </div>
+        )}
         {captureDirectory && (
           <p className="capture-status">Snapshots folder: {captureDirectory}</p>
         )}
