@@ -26,14 +26,31 @@ export function useExamTimer(isStarted, onTimeExpired) {
   useEffect(() => {
     if (!isStarted) return;
 
-    // Initial sync
-    syncRemainingTime();
+    let isMounted = true;
+    const fetchRemaining = async () => {
+      if (typeof window.electronAPI?.getRemainingTime !== "function") return;
+      try {
+        const remaining = await window.electronAPI.getRemainingTime();
+        if (isMounted) {
+          setTimeRemainingMs(remaining);
+          if (remaining <= 0 && typeof onTimeExpired === "function") {
+            onTimeExpired();
+          }
+        }
+      } catch (err) {
+        console.error("Failed to sync remaining exam time:", err);
+      }
+    };
 
-    // 1-second interval
-    const interval = setInterval(syncRemainingTime, 1000);
+    fetchRemaining();
+    const interval = setInterval(fetchRemaining, 1000);
 
-    return () => clearInterval(interval);
-  }, [isStarted, syncRemainingTime]);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isStarted, onTimeExpired]);
+
 
   return {
     timeRemainingMs,

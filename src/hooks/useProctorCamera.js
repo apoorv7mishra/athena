@@ -111,12 +111,14 @@ export function useProctorCamera(isExamActive) {
 
   // Teardown tracks on unmount
   useEffect(() => {
+    const activeVideo = videoRef.current;
     return () => {
-      if (videoRef.current?.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+      if (activeVideo?.srcObject) {
+        activeVideo.srcObject.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
+
 
   return {
     videoRef,
