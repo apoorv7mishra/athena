@@ -615,3 +615,41 @@ appearing in the layout.
     flex-direction: column;
   }
 }
+
+/* Question Review Flag Styles */
+.btn-flag {
+  background: transparent;
+  border: 1px solid var(--color-border, #dcdad5);
+  border-radius: var(--radius-sm, 6px);
+  padding: 4px 10px;
+  font-size: 13px;
+  color: var(--color-text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-flag:hover {
+  background: #f0f0f0;
+  border-color: #b0b0b0;
+}
+
+.btn-flag.is-flagged {
+  background: #fff3e0;
+  color: #e65100;
+  border-color: #ffb74d;
+  font-weight: 600;
+}
+
+.question-jump.is-flagged {
+  border-color: #ff9800;
+  position: relative;
+}
+
+.flag-indicator {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 10px;
+  color: #e65100;
+}
+

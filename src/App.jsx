@@ -15,7 +15,9 @@ function App() {
   const [submitted, setSubmitted] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [flaggedQuestions, setFlaggedQuestions] = useState({});
   const [helpOpen, setHelpOpen] = useState(false);
+
 
   // Custom Camera Proctor Hook
   const {
@@ -78,11 +80,19 @@ function App() {
     stopCamera();
   }
 
+  function toggleFlagQuestion(index) {
+    setFlaggedQuestions((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  }
+
   function handleRestart() {
     setSubmitted(false);
     setStarted(false);
     setQuestionIndex(0);
     setAnswers({});
+    setFlaggedQuestions({});
   }
 
   // Active or Completed Exam View
@@ -114,6 +124,7 @@ function App() {
                 questions={questions}
                 currentIndex={questionIndex}
                 answers={answers}
+                flaggedQuestions={flaggedQuestions}
                 onSelectIndex={setQuestionIndex}
               />
 
@@ -122,6 +133,8 @@ function App() {
                 questionIndex={questionIndex}
                 totalQuestions={questions.length}
                 selectedAnswer={answers[questionIndex]}
+                isFlagged={Boolean(flaggedQuestions[questionIndex])}
+                onToggleFlag={() => toggleFlagQuestion(questionIndex)}
                 onSelectAnswer={selectAnswer}
                 onPrevious={() => setQuestionIndex((i) => Math.max(0, i - 1))}
                 onNext={() =>
@@ -131,6 +144,7 @@ function App() {
               />
             </>
           )}
+
 
           {captureMessage && <p className="capture-status">{captureMessage}</p>}
           {captureDirectory && (

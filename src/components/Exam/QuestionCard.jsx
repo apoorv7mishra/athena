@@ -16,6 +16,8 @@ export function QuestionCard({
   questionIndex,
   totalQuestions,
   selectedAnswer,
+  isFlagged,
+  onToggleFlag,
   onSelectAnswer,
   onPrevious,
   onNext,
@@ -26,10 +28,22 @@ export function QuestionCard({
 
   return (
     <section className="question-card">
-      <h2>
-        Question {questionIndex + 1} of {totalQuestions}
-      </h2>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2>
+          Question {questionIndex + 1} of {totalQuestions}
+        </h2>
+        <button
+          type="button"
+          className={`btn-flag${isFlagged ? " is-flagged" : ""}`}
+          onClick={onToggleFlag}
+          aria-label={isFlagged ? "Remove review flag" : "Flag question for review"}
+          title={isFlagged ? "Remove review flag" : "Flag question for review"}
+        >
+          {isFlagged ? "⚑ Flagged" : "⚐ Flag for review"}
+        </button>
+      </div>
       <p>{question.prompt}</p>
+
 
       <div role="radiogroup" aria-label={question.prompt}>
         {question.options.map((option) => (
